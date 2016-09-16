@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.uimanager.annotations.ReactProp;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Base class that should be suitable for the majority of subclasses of {@link ViewManager}.
@@ -34,6 +35,8 @@ public abstract class BaseViewManager<T extends View, C extends LayoutShadowNode
   private static final String PROP_SCALE_Y = "scaleY";
   private static final String PROP_TRANSLATE_X = "translateX";
   private static final String PROP_TRANSLATE_Y = "translateY";
+
+  private static final ConcurrentHashMap<String, Integer> TEST_IDS = new ConcurrentHashMap<>();
 
   /**
    * Used to locate views in end-to-end (UI) tests.
@@ -84,6 +87,13 @@ public abstract class BaseViewManager<T extends View, C extends LayoutShadowNode
 
   @ReactProp(name = PROP_TEST_ID)
   public void setTestId(T view, String testId) {
+    if (!TEST_IDS.containsKey(testId)) {
+      TEST_IDS.put(testId, view.getResources().getIdentifier(testId, "id", view.getContext().getPackageName()));
+    }
+    int mappedTestId = TEST_IDS.get(testId);
+    if (mappedTestId != 0) {
+      view.setId(mappedTestId);
+    }
     view.setTag(testId);
   }
 
