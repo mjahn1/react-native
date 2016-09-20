@@ -37,6 +37,7 @@ public abstract class BaseViewManager<T extends View, C extends LayoutShadowNode
   private static final String PROP_TRANSLATE_Y = "translateY";
 
   private static final ConcurrentHashMap<String, Integer> TEST_IDS = new ConcurrentHashMap<>();
+  private static final ConcurrentHashMap<Integer, Integer> MAPPED_TEST_IDS = new ConcurrentHashMap<>();
 
   /**
    * Used to locate views in end-to-end (UI) tests.
@@ -91,10 +92,21 @@ public abstract class BaseViewManager<T extends View, C extends LayoutShadowNode
       TEST_IDS.put(testId, view.getResources().getIdentifier(testId, "id", view.getContext().getPackageName()));
     }
     int mappedTestId = TEST_IDS.get(testId);
-    if (mappedTestId != 0) {
+    if (mappedTestId > 0) {
+      if (view.getId() > 0) {
+        MAPPED_TEST_IDS.put(mappedTestId, view.getId());
+      }
       view.setId(mappedTestId);
     }
     view.setTag(testId);
+  }
+
+  public static int getManagedTestId(View view) {
+    Integer mappedId = MAPPED_TEST_IDS.get(view.getId());
+    if (mappedId != null) {
+      return mappedId;
+    }
+    return view.getId();
   }
 
   @ReactProp(name = PROP_ACCESSIBILITY_LABEL)
