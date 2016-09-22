@@ -55,6 +55,8 @@ import com.facebook.react.views.webview.events.TopMessageEvent;
 import org.json.JSONObject;
 import org.json.JSONException;
 
+import static com.facebook.react.common.TestIdUtil.getOriginalReactTag;
+
 /**
  * Manages instances of {@link WebView}
  *
@@ -123,7 +125,7 @@ public class ReactWebViewManager extends SimpleViewManager<WebView> {
       dispatchEvent(
           webView,
           new TopLoadingStartEvent(
-              webView.getId(),
+              webView,
               createWebViewEvent(webView, url)));
     }
 
@@ -159,7 +161,7 @@ public class ReactWebViewManager extends SimpleViewManager<WebView> {
 
       dispatchEvent(
           webView,
-          new TopLoadingErrorEvent(webView.getId(), eventData));
+          new TopLoadingErrorEvent(webView, eventData));
     }
 
     @Override
@@ -169,7 +171,7 @@ public class ReactWebViewManager extends SimpleViewManager<WebView> {
       dispatchEvent(
           webView,
           new TopLoadingStartEvent(
-              webView.getId(),
+              webView,
               createWebViewEvent(webView, url)));
     }
 
@@ -177,13 +179,13 @@ public class ReactWebViewManager extends SimpleViewManager<WebView> {
       dispatchEvent(
           webView,
           new TopLoadingFinishEvent(
-              webView.getId(),
+              webView,
               createWebViewEvent(webView, url)));
     }
 
     private WritableMap createWebViewEvent(WebView webView, String url) {
       WritableMap event = Arguments.createMap();
-      event.putDouble("target", webView.getId());
+      event.putDouble("target", getOriginalReactTag(webView));
       // Don't use webView.getUrl() here, the URL isn't updated to the new value yet in callbacks
       // like onPageFinished
       event.putString("url", url);
@@ -503,7 +505,7 @@ public class ReactWebViewManager extends SimpleViewManager<WebView> {
           dispatchEvent(
             webView,
             new ContentSizeChangeEvent(
-              webView.getId(),
+              webView,
               webView.getWidth(),
               webView.getContentHeight()));
         }
